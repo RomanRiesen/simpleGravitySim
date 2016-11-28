@@ -79,10 +79,10 @@ function Planet(x, y, m=100, r=25, color='rgba(0,0,0,1)'){
     this.v.x += f.x/m
     this.v.y += f.y/m
 
-    if(this.v.x > 900){this.v.x = 900}//ABSOLUTELY GUESTIMATED!!!
-    if(this.v.y > 900){this.v.y = 900}//ABSOLUTELY GUESTIMATED!!!
-    if(this.v.x < -900){this.v.x = -900}//ABSOLUTELY GUESTIMATED!!!
-    if(this.v.y < -900){this.v.y = -900}//ABSOLUTELY GUESTIMATED!!!
+    if(this.v.x > 1200){this.v.x = 1200}//ABSOLUTELY GUESTIMATED!!!
+    if(this.v.y > 1200){this.v.y = 1200}//ABSOLUTELY GUESTIMATED!!!
+    if(this.v.x < -1200){this.v.x = -1200}//ABSOLUTELY GUESTIMATED!!!
+    if(this.v.y < -1200){this.v.y = -1200}//ABSOLUTELY GUESTIMATED!!!
   }
 }
 
@@ -118,7 +118,7 @@ function Vector(x,y){
 
 <script>
 
-var numberOfPlanets = uniform(5,11)//5
+var numberOfPlanets = uniform(6,11)//5
 var t = 0.007
 var gravityConst = 0.1//0.1
 var rho = 1
