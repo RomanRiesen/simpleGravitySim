@@ -118,7 +118,7 @@ function Vector(x,y){
 
 <script>
 
-var numberOfPlanets = uniform(4,9)//5
+var numberOfPlanets = uniform(5,11)//5
 var t = 0.01
 var gravityConst = 0.1//0.1
 var rho = 1
@@ -148,11 +148,11 @@ update()
 
 function update(){
   //ctx.clearRect(0, 0, c.width, c.height)
-  if(n++ >= 10){//enables longer tails
-    ctx.fillStyle = 'rgba(0,0,0,0.04)'//"fading tails"
+  //if(n++ >= 10){//enables longer tails
+    ctx.fillStyle = 'rgba(0,0,0,0.06)'//"fading tails"
     ctx.fillRect(0,0,c.width,c.height)
-    n=0
-  }
+    //n=0
+  //}
 
   //calculate gravity in x and y direction towards all other Planets and sum them up
   for (var i = 0; i<PlanetArr.length; i++){
