@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
-<body>
-
+<body style = "width:100%; height:100%">
 
 <canvas id="myCanvas" width="600" height="600" style="border:1px solid #d3d3d3;">
 Your browser does not support the HTML5 canvas tag.</canvas>
@@ -149,7 +148,7 @@ update()
 function update(){
   //ctx.clearRect(0, 0, c.width, c.height)
   //if(n++ >= 10){//enables longer tails
-    ctx.fillStyle = 'rgba(0,0,0,0.06)'//"fading tails"
+    ctx.fillStyle = 'rgba(0,0,0,0.1)'//"fading tails"
     ctx.fillRect(0,0,c.width,c.height)
     //n=0
   //}
@@ -170,7 +169,6 @@ function update(){
         }
     //add force*t/mass = v to x and y direction
     PlanetArr[i].addForce(f)
-
   }
 
   for (var i = 0; i<PlanetArr.length; i++){
