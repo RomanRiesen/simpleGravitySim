@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+
+<canvas id="myCanvas" width="600" height="600" style="border:1px solid #d3d3d3;">
+Your browser does not support the HTML5 canvas tag.</canvas>
+
+<script>
+//please put the stuff inside this script tag into another file.
+//also get rid of all the global variables.
+
+function uniform(min,max){
+  return((Math.random()*(max-min)+min))
+}
+
+function HSVtoRGB(h, s, v) {
+    var r, g, b, i, f, p, q, t;
+    if (arguments.length === 1) {
+        s = h.s, v = h.v, h = h.h;
+    }
+    i = Math.floor(h * 6);
+    f = h * 6 - i;
+    p = v * (1 - s);
+    q = v * (1 - f * s);
+    t = v * (1 - (1 - f) * s);
+    switch (i % 6) {
+        case 0: r = v, g = t, b = p; break;
+        case 1: r = q, g = v, b = p; break;
+        case 2: r = p, g = v, b = t; break;
+        case 3: r = p, g = q, b = v; break;
+        case 4: r = t, g = p, b = v; break;
+        case 5: r = v, g = p, b = q; break;
+    }
+    return {
+        r: Math.round(r * 255),
+        g: Math.round(g * 255),
+        b: Math.round(b * 255)
+    };
+}
+
+function randomRGB(){
+  var color = HSVtoRGB(Math.random(),uniform(0.7,1),1)
+  return('rgb('+color.r+","+color.g+","+color.b+')')
+}
+
+function Planet(x, y, m=100, r=25, color='rgba(0,0,0,1)'){
+  this.pos = new Vector(x,y)
+  this.v = new Vector(0,0)
+  this.m = m
+  this.r = r
+  this.color = color
+
+  this.draw = function(ctx){
+    ctx.fillStyle = this.color//'rgb(225,0,112)'
+    ctx.beginPath()
+    ctx.arc(this.pos.x,this.pos.y,this.r,0,2*Math.PI)
+    ctx.fill()
+  }
+
+  this.update = function(ctx){
+    this.pos.x += this.v.x*t
+    this.pos.y += this.v.y*t
+
+    this.pos.x %= c.width //warp around
+    this.pos.y %= c.height
+    if(this.pos.x < 1){this.pos.x += c.width}
+    if(this.pos.y < 1){this.pos.y += c.height}
+
+    // this.pos.x = this.pos.x < 1 ? 0 : this.pos.x //not warp around
+    // this.pos.x = this.pos.x > c.width ? c.width : this.pos.x
+    // this.pos.y = this.pos.y < 1 ? 0 : this.pos.y
+    // this.pos.y = this.pos.y > c.width ? c.width : this.pos.y
+
+    this.draw(ctx)
+  }
+
+  this.addForce = function(f){
+    this.v.x += f.x/m
+    this.v.y += f.y/m
+
+    if(this.v.x > 900){this.v.x = 900}//ABSOLUTELY GUESTIMATED!!!
+    if(this.v.y > 900){this.v.y = 900}//ABSOLUTELY GUESTIMATED!!!
+    if(this.v.x < -900){this.v.x = -900}//ABSOLUTELY GUESTIMATED!!!
+    if(this.v.y < -900){this.v.y = -900}//ABSOLUTELY GUESTIMATED!!!
+  }
+}
+
+function Vector(x,y){
+  this.x = x
+  this.y = y
+
+  this.length = function(){
+    return (this.x**2+this.y**2)**0.5
+  }
+
+  this.normalize = function(){
+    return new Vector(this.x/this.length,this.y/this.length)
+  }
+
+  this.dot = function(v){
+    return this.x*v.x+this.y*v.y
+  }
+
+  this.min = function(v){
+    return new Vector(this.x-v.x,this.y-v.y)
+  }
+
+  this.plus = function(v){
+    return new Vector(this.x+v.x,this.y+v.y)
+  }
+
+  this.dist = function(v){
+    return length(v.min(this))
+  }
+}
+</script>
+
+<script>
+
+var numberOfPlanets = 5
+var t = 0.01
+var gravityConst = 0.1//0.1
+var rho = 1
+var maxRadius = 17
+var minRadius = 8
+
+var c = document.getElementById("myCanvas")
+var ctx = c.getContext("2d")
+c.width = window.innerWidth;
+c.height = window.innerHeight;
+
+var PlanetArr = new Array()
+for (var i = 0; i<numberOfPlanets;i++){
+  var r = uniform(minRadius, maxRadius)
+  PlanetArr[i] = new Planet(uniform(r,c.width-r),uniform(r,c.height-r),r**2*3.14*rho,r,randomRGB())
+  //PlanetArr[i].addForce(new Vector(uniform(-1000,1000),uniform(-1000,1000)))//random initial forces
+  PlanetArr[i].update(ctx)
+}
+
+PlanetArr.push(new Planet(c.width/2,c.height/2,10000,20,'rgb(244, 229, 66)'))//"Star"(heavy object in the middle)
+
+ctx.fillStyle = 'rgba(0,0,0,1)'
+ctx.fillRect(0,0,c.width,c.height)
+
+var n=0
+update()
+
+function update(){
+  //ctx.clearRect(0, 0, c.width, c.height)
+  if(n++ >= 10){//enables longer tails
+    ctx.fillStyle = 'rgba(0,0,0,0.04)'//"fading tails"
+    ctx.fillRect(0,0,c.width,c.height)
+    n=0
+  }
+
+  //calculate gravity in x and y direction towards all other Planets and sum them up
+  for (var i = 0; i<PlanetArr.length; i++){
+    //calculate total force onto this Planet
+    var f = new Vector(0,0)
+
+    for (var j = 0; j<PlanetArr.length; j++){
+        if(j ===  i){continue}
+        var d = 0
+        //calc distance to other Planet
+        d = PlanetArr[i].pos.min(PlanetArr[j].pos)
+        //calculate force
+        var F = -gravityConst*(PlanetArr[i].m*PlanetArr[j].m)/(d.length()**2)
+        f = f.plus(new Vector(F*d.x,F*d.y))//Add all forces in from all the other Planets
+        }
+    //add force*t/mass = v to x and y direction
+    PlanetArr[i].addForce(f)
+
+  }
+
+  for (var i = 0; i<PlanetArr.length; i++){
+    PlanetArr[i].update(ctx)
+    //PlanetArr[i].color = randomRGB()
+    //PlanetArr[i].addForce(new Vector(uniform(-100,100),uniform(-100,100)))//"Brownian motion"?
+  }
+  window.requestAnimationFrame(update)
+}
+
+</script>
+
+</body>
+</html>
